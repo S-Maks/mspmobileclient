@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mspmobileclient/dashboard.dart';
 
 void main() {
   runApp(App());
@@ -122,8 +123,10 @@ class _LoginState extends State<Login> {
                         minWidth: MediaQuery.of(context).size.width,
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         onPressed: () {
-                          print(
-                              "Username ${usernameCtrl.text}, password: ${passwordCtrl.text}");
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Dashboard()));
                         },
                         child: Text("Login",
                             textAlign: TextAlign.center,
