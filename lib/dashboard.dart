@@ -33,7 +33,6 @@ class Dashboard extends StatelessWidget {
               else {
                 final agents = snapshot.data[0] as Page;
                 final patches = snapshot.data[1] as int;
-
                 return Container(
                   margin: EdgeInsets.all(20),
                   child: Column(children: [
@@ -240,8 +239,20 @@ Future<Page> fetchAgents() async {
     FORMAT JSON
   ''';
   final response =
-      await get(Uri.http('192.168.0.102:8123', '', {"query": query}));
+      await get(Uri.http('172.28.128.3:30004', '', {"query": query}));
 
+  /*final response1 = await post(
+      Uri.http("172.28.128.3:30008",
+          "/auth/realms/msp/protocol/openid-connect/token"),
+      body: {
+        "client_id": "gateway",
+        "grant_type": "password",
+        "scope": "openid",
+        "username": "admin",
+        "password": "admin"
+      });
+  Token token = Token.fromJson(jsonDecode(response1.body));
+  token.showToken();*/
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
@@ -260,8 +271,16 @@ Future<int> fetchInstalledPatches() async {
     WHERE PatchState = 1
   ''';
   final response =
-      await get(Uri.http('192.168.0.102:8123', '', {"query": query}));
-
+      await get(Uri.http('172.28.128.3:30004', '', {"query": query}));
+  /* final response = await get(Uri.parse("http://172.28.128.3:30009/api/agg/patches"),
+      headers: {HttpHeaders.authorizationHeader: "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJwQUZnZndzeGZkaFpvLTkyQWNLZnpDOFNfbWZSeXdzN2pYcEE0a1BobnlNIn0.eyJleHAiOjE2MTk1MTc3MzMsImlhdCI6MTYxOTUxNzEzMywianRpIjoiOTQ5ZGVmNDYtOTkzOC00MzBiLTg1M2UtNjQxOTUyOTI0OTE0IiwiaXNzIjoiaHR0cDovLzE3Mi4yOC4xMjguMzozMDAwOC9hdXRoL3JlYWxtcy9tc3AiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiOTk0Mjc1MzEtNTk4MC00NDA4LWE1OTQtZmE1YmRjZWQ1Njg1IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiZ2F0ZXdheSIsInNlc3Npb25fc3RhdGUiOiJkMGIxNzI4ZS03NDU5LTQ2OTAtYTBlOS0wNmJiYWUyYzIyMGQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly8xNzIuMjguMTI4LjM6MzAwMDgiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIlJFQUQiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4ifQ.DW9D8odC0Xop2hNiTjStg5ZBUVPJvB-j6z3zbh-W5WbcpZCOkESlTMeHh_ZHNVyiKz7LEWye46aHxxccR9P-feSOBPA5nSNb3GL7EreBB4_VWY3XrVk-4WgHGhHmKxONiL3MM0vZxg5UYzeh-aK4rJW7dnkp7cRnjqx_AMIDE3k8NJDVtUVcIkSGEoTSbGcRQUeB6eOPuDWSwnFXt9tWArvGXzGF8oz3tM-ARvTTFu4RJ3_og02wsE_iK_JEWWdjcURBBH8PJqQnkJK9bWZQXyTHu2yg0geyu19QGPY2DYNHaY1z6zGfwcqkCqsrIabfF3oLQQWtpVseNcid6tJXng"});
+*/
+  /*final test =
+      await get(Uri.http('172.28.128.3:30009','/api/agg/agents', {"Authorization":
+      "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJwQUZnZndzeGZkaFpvLTkyQWNLZnpDOFNfbWZSeXdzN2pYcEE0a1BobnlNIn0.eyJleHAiOjE2MTk0NTU0ODAsImlhdCI6MTYxOTQ1NTE4MCwiYXV0aF90aW1lIjoxNjE5NDUzNzY3LCJqdGkiOiI5NGRhM2E0OS05YmVjLTQ2MWEtYjM0MS02MjhkNjcwYzYwZmIiLCJpc3MiOiJodHRwOi8vMTcyLjI4LjEyOC4zOjMwMDA4L2F1dGgvcmVhbG1zL21zcCIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiI5OTQyNzUzMS01OTgwLTQ0MDgtYTU5NC1mYTViZGNlZDU2ODUiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJnYXRld2F5Iiwic2Vzc2lvbl9zdGF0ZSI6IjMzNDU3YjA2LTA3ZTEtNDRhMS04MGExLTc3MzJjZTZkZTc3MSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovLzE3Mi4yOC4xMjguMzozMDAwOCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUkVBRCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhZG1pbiJ9.aixGDlyw7gMdOJZcsvb4U-6HfPJ70Ph5ubnAcRPv9M4Y0QxodMQM2NgfR76hZr2C_J6JOZFU9x1ywDnkb-oBPGISjYzGWFk-bFjiIGH5SCcz1jm79-vpwR08WXdXP3wPDgE-rsI9K1VOH1nVN-K1wUVgFCZoe8RXE-NWF_uRmkvqZJf2JRKs4bwLM7RvJ9UoLk_UZe_AkoTfNEWedUVCA_rlTzwoD1O1MP802fAkE_nl6glHm8Lcw6kSekGlSz1wTSE7EO2RJ7D00ukIvgsZQOhyNLwLioVDN4gr7KmjecDZLe1XTsMIW0b30P_5_fwYJttjyn5gNO1IZovhlsoPMg"
+      }));*/
+  /*print(test.statusCode);
+  print(test.body);*/
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
@@ -335,5 +354,19 @@ class AgentStat {
 
   factory AgentStat.fromJson(Map<String, dynamic> json) {
     return AgentStat(kind: json['Kind'], count: int.parse(json['Count']));
+  }
+}
+
+class Token{
+  final String access_token;
+  Token({@required this.access_token});
+
+  factory Token.fromJson(Map<String, dynamic> json) {
+    return Token(
+        access_token: json['access_token']);
+  }
+
+  void showToken(){
+    print(access_token);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:mspmobileclient/dashboard.dart';
 
 void main() {
@@ -123,6 +124,7 @@ class _LoginState extends State<Login> {
                         minWidth: MediaQuery.of(context).size.width,
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         onPressed: () {
+                          final test = Future.value(Future.wait([auth()]));
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -143,5 +145,21 @@ class _LoginState extends State<Login> {
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<String> auth() async {
+    //print(usernameCtrl);
+    //print(passwordCtrl);
+    final response = await post(
+        Uri.http("172.28.128.3:30008",
+            "/auth/realms/msp/protocol/openid-connect/token"),
+        body: {
+          "client_id": "gateway",
+          "grant_type": "password",
+          "scope": "openid",
+          "username": "admin",
+          "password": "admin"
+        });
+    return response.body;
   }
 }
