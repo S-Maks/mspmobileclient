@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:mspmobileclient/dashboard.dart';
+import 'dart:convert';
 
 void main() {
   runApp(App());
@@ -124,11 +125,13 @@ class _LoginState extends State<Login> {
                         minWidth: MediaQuery.of(context).size.width,
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         onPressed: () {
-                          final test = Future.value(Future.wait([auth()]));
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Dashboard()));
+                          auth(usernameCtrl, passwordCtrl).then((token) => {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            Dashboard(token: token)))
+                              });
                         },
                         child: Text("Login",
                             textAlign: TextAlign.center,
@@ -147,9 +150,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Future<String> auth() async {
-    //print(usernameCtrl);
-    //print(passwordCtrl);
+  Future<String> auth(TextEditingController username, TextEditingController password) async {
     final response = await post(
         Uri.http("172.28.128.3:30008",
             "/auth/realms/msp/protocol/openid-connect/token"),
@@ -157,9 +158,22 @@ class _LoginState extends State<Login> {
           "client_id": "gateway",
           "grant_type": "password",
           "scope": "openid",
-          "username": "admin",
-          "password": "admin"
+          "username": username.text,
+          "password": password.text
         });
-    return response.body;
+    if (response.statusCode == 200) {
+      return Token.fromJson(jsonDecode(response.body)).access_token;
+    } else {
+      throw Exception('Invalid login or password');
+    }
+  }
+}
+
+class Token {
+  final String access_token;
+  Token({@required this.access_token});
+
+  factory Token.fromJson(Map<String, dynamic> json) {
+    return Token(access_token: json['access_token']);
   }
 }
