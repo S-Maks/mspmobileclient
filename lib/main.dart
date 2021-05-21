@@ -125,15 +125,28 @@ class _LoginState extends State<Login> {
                         minWidth: MediaQuery.of(context).size.width,
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         onPressed: () {
-                          auth(usernameCtrl, passwordCtrl).then((token) => {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            Dashboard(token: token)))
-                              });
+                          auth(usernameCtrl, passwordCtrl)
+                              .then((token) => {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                Dashboard(token: token)))
+                                  })
+                              .catchError((onError) => {
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(0, 20, 0, 10),
+                                      child: Text(
+                                        'MSP Invoice Dashboard',
+                                        style: style.copyWith(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  });
                         },
-                        child: Text("Login",
+                        child: Text("Invalid login or password",
                             textAlign: TextAlign.center,
                             style: style.copyWith(
                                 color: Colors.white,
@@ -150,7 +163,8 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Future<String> auth(TextEditingController username, TextEditingController password) async {
+  Future<String> auth(
+      TextEditingController username, TextEditingController password) async {
     final response = await post(
         Uri.http("172.28.128.3:30008",
             "/auth/realms/msp/protocol/openid-connect/token"),
@@ -164,7 +178,7 @@ class _LoginState extends State<Login> {
     if (response.statusCode == 200) {
       return Token.fromJson(jsonDecode(response.body)).access_token;
     } else {
-      throw Exception('Invalid login or password');
+      throw new Exception('Invalid login or password');
     }
   }
 }
